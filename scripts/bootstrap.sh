@@ -46,6 +46,7 @@ git config --global user.email mcc@conceptquanta.com
 
 # set up git user
 adduser git
+date +%s | md5sum | base64 | head -c 32 | passwd git --stdin
 mkdir /var/www
 chown -R git /var/www
 chmod -R g+ws /var/www
