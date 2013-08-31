@@ -6,6 +6,7 @@
   "bin": {
     "mcc": "bin/mcc.js"
   },
+  "main": "lib/tools.js",
   "dependencies": {
     "commander": "~2.0.0",
     "forever": "~0.10.8",

@@ -1,0 +1,29 @@
+upstream {{appname}}_upstream {
+	server 127.0.0.1:{{port}};
+}
+
+# use a nginx cache?
+# http://blog.argteam.com/coding/hardening-node-js-for-production-part-2-using-nginx-to-avoid-node-js-load/
+
+# the nginx server instance
+server {
+	listen 0.0.0.0:80;
+	server_name {{appname}}.{{hostname}};
+	access_log /var/log/nginx/{{appname}}.log;
+
+	# pass the request to the node.js server with the correct headers and much more can be added, see nginx config options
+	location / {
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header Host $http_host;
+		proxy_set_header X-NginX-Proxy true;
+
+		proxy_pass http://{{appname}}_upstream;
+		proxy_redirect off;
+
+		# Allows for websocket connections
+		proxy_http_version 1.1;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection "upgrade";
+	}
+}
