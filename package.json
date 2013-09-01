@@ -2,15 +2,16 @@
   "name": "mcc",
   "version": "0.0.1",
   "description": "mission control center is a tool to automatically configure an nginx server for multiple node apps",
-  "scripts": {},
   "bin": {
     "mcc": "bin/mcc.js"
   },
   "main": "lib/tools.js",
   "dependencies": {
     "commander": "~2.0.0",
-    "forever": "~0.10.8",
-    "express": "~3.3.5",
-    "winston": "~0.7.2"
+    "winston": "~0.7.2",
+    "daemonize2": "~0.4.2",
+    "node-persist": "0.0.1",
+    "express": "~3.3.7",
+    "hogan.js": "~2.0.0"
   }
 }

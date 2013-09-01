@@ -1,2 +1,7 @@
+
+# app stuff
+persist/
+
+# lib stuff
 node_modules/
 .vagrant/
