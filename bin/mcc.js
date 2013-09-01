@@ -6,6 +6,8 @@ var program = require('commander'),
 	def = require('../package.json'),
 	path = require('path');
 
+var logger = require('../lib/logHandler').defaultLogger;
+
 var daemon = require('daemonize2')
 	.setup({
 		main: path.join(__dirname, '../lib/daemon.js'),
@@ -27,12 +29,14 @@ daemon
 	})
 	.on('started', function(pid) {
 		// console.log('Daemon started. PID: ' + pid);
+		logger.info('daemon started. PID: ' + pid);
 	})
 	.on('stopping', function() {
 		// console.log('Stopping daemon...');
 	})
 	.on('stopped', function(pid) {
 		// console.log('Daemon stopped.');
+		logger.info('daemon stopped.');
 	})
 	.on('running', function(pid) {
 		// console.log('Daemon already running. PID: ' + pid);
@@ -42,6 +46,7 @@ daemon
 	})
 	.on('error', function(err) {
 		// console.log('Daemon failed to start: ' + err.message);
+		logger.info('daemon failed to start: ' + err.message);
 	});
 
 program.version(def.version);
@@ -98,6 +103,7 @@ program.command('status')
 	});
 
 
+
 // service related commands
 var setup = require('../lib/setup');
 program
@@ -105,7 +111,6 @@ program
 	.description('adds a service to mcc')
 	.action(function(service, hostname, options) {
 		setup.add(service, hostname);
-		// daemon.sendSignal("SIGUSR1");
 	});
 
 program
@@ -120,13 +125,22 @@ program
 	.description('enables a service in nginx and makes it live')
 	.action(function(service, options) {
 		setup.enable(service);
+		daemon.sendSignal("SIGUSR1");
 	});
 
 program
 	.command('disable <service>')
-	.description('removes a service from the enabled list')
+	.description('removes a service from the enabled list and takes it down')
 	.action(function(service, options) {
 		setup.disable(service);
+		daemon.sendSignal("SIGUSR1");
+	});
+
+program
+	.command('reload')
+	.description('tells mcc to update its state to match the config')
+	.action(function(service, options) {
+		daemon.sendSignal("SIGUSR1");
 	});
 
 program
@@ -135,6 +149,8 @@ program
 	.action(function(options) {
 		console.log(setup.list());
 	});
+
+
 
 // configuration commands
 var configure = require('../lib/configure');
@@ -166,5 +182,6 @@ program
 program.parse(process.argv);
 
 if (!program.args.length) {
+	//show help if no command is chosen
 	program.help();
 }

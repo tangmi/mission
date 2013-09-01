@@ -12,7 +12,7 @@ upstream {{appname}}_upstream {
 # the nginx server instance
 server {
 	listen 0.0.0.0:80;
-	server_name {{appname}}.{{hostname}};
+	server_name {{hostname}};
 	access_log /var/log/nginx/{{appname}}.log;
 
 	# pass the request to the node.js server with the correct headers and much more can be added, see nginx config options
