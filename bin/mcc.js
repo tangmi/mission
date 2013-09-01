@@ -125,7 +125,7 @@ program
 	.description('enables a service in nginx and makes it live')
 	.action(function(service, options) {
 		setup.enable(service);
-		daemon.sendSignal("SIGUSR1");
+		// daemon.sendSignal("SIGUSR1");
 	});
 
 program
@@ -133,7 +133,7 @@ program
 	.description('removes a service from the enabled list and takes it down')
 	.action(function(service, options) {
 		setup.disable(service);
-		daemon.sendSignal("SIGUSR1");
+		// daemon.sendSignal("SIGUSR1");
 	});
 
 program
