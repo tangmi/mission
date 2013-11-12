@@ -19,10 +19,10 @@ var daemon = require('daemonize2')
 		silent: false
 	});
 
-// if (process.getuid() != 0) {
-// console.log('Expected to run as root');
-// process.exit(1);
-// }
+if (process.getuid() != 0) {
+	console.log('expected to run as root, exiting.');
+	process.exit(1);
+}
 
 daemon
 	.on('starting', function() {
