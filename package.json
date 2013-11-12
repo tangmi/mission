@@ -1,23 +1,25 @@
 {
-	"name": "mcc",
-	"version": "0.0.1",
-	"description": "mission control center is a tool to automatically configure an nginx server for multiple node apps",
-	"scripts": {
-		"test": "node_modules/.bin/mocha -R spec"
-	},
-	"bin": {
-		"mcc": "bin/mcc.js"
-	},
-	"main": "lib/tools.js",
-	"dependencies": {
-		"commander": "~2.0.0",
-		"winston": "~0.7.2",
-		"daemonize2": "~0.4.2",
-		"node-persist": "0.0.1",
-		"express": "~3.3.7",
-		"hogan.js": "~2.0.0"
-	},
-	"devDependencies": {
-		"mocha": "~1.12.1"
-	}
+  "name": "mcc",
+  "version": "0.0.1",
+  "description": "mission control center is a tool to automatically configure an nginx server for multiple node apps",
+  "scripts": {
+    "test": "node_modules/.bin/mocha -R spec"
+  },
+  "bin": {
+    "mcc": "bin/mcc.js"
+  },
+  "main": "lib/tools.js",
+  "dependencies": {
+    "commander": "~2.0.0",
+    "winston": "~0.7.2",
+    "daemonize2": "~0.4.2",
+    "express": "~3.3.7",
+    "hogan.js": "~2.0.0",
+    "node-document": "0.1.0-pre9",
+    "node-document-storage-fs": "~0.1.0",
+    "node-env-flag": "~0.1.0"
+  },
+  "devDependencies": {
+    "mocha": "~1.12.1"
+  }
 }

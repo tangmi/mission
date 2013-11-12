@@ -6,13 +6,14 @@ var program = require('commander'),
 	def = require('../package.json'),
 	path = require('path');
 
-var logger = require('../lib/logHandler').defaultLogger;
+var logger = require('../lib/logHandler').defaultLogger,
+	config = require('../config');
 
 var daemon = require('daemonize2')
 	.setup({
 		main: path.join(__dirname, '../lib/daemon.js'),
 		name: 'mission',
-		pidfile: '/var/run/mission.pid',
+		// pidfile: path.join(config.missionfolder, 'mission.pid'), //default /var/run/mission.pid
 		// user: 'git',
 		// group: 'git',
 		silent: false
@@ -163,9 +164,11 @@ program
 			console.log(configure.list());
 		} else {
 			if (key && value) {
-				configure.set(key, value);
+				configure.set(key, value, function() {});
 			} else if (key) {
-				console.log(configure.get(key));
+				configure.get(key, function(value) {
+					console.log(value);
+				});
 			} else {
 				console.log('');
 				console.log('  Usage: mcc config[options][key][value]');
