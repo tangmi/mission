@@ -1,3 +1,11 @@
+/*
+ * launcher.js
+ *
+ * manages starting/stopping services and piping their
+ * output to the correct logfiles
+ * 
+ */
+
 var path = require('path'),
 	spawn = require('child_process').spawn;
 
@@ -11,7 +19,8 @@ var apps = require('./apps');
 
 var config = require('../config');
 
-//key=servicename, value=(process + port field)
+//key=servicename
+//value=(process + extra port field)
 var processes = {};
 
 
@@ -19,10 +28,13 @@ var processes = {};
 //for testing
 startApp(apps('test'));
 startApp(apps('test'));
-// console.log(processes);
 
 
+/*
+ * exported methods
+ */
 
+//start an service from a parsed MissionFile
 function startApp(service) {
 	var running = findProcessByServiceName(service.name);
 	if(running) {
@@ -53,12 +65,12 @@ function startApp(service) {
 
 	processes[service.name].stdout.on('data', function(data) {
 		printAppOutput('log', service.name, data.toString());
-		logHandler.getLogger(service.name).info(data.toString());
+		logHandler.getLogger(service).info(data.toString());
 	});
 
 	processes[service.name].stderr.on('data', function(data) {
 		printAppOutput('err', service.name, data.toString());
-		logHandler.getLogger(service.name).error(data.toString());
+		logHandler.getLogger(service).error(data.toString());
 	});
 
 	processes[service.name].on('close', function(code) {
@@ -92,6 +104,20 @@ function restartApp(service) {
 		startApp(service);
 	}, 2000);
 }
+
+
+/*
+ * exports
+ */
+
+module.exports.start = startApp;
+module.exports.stop = stopApp;
+module.exports.restart = restartApp;
+
+
+/*
+ * helper methods
+ */
 
 function findProcessByServiceName(name) {
 	for (var servicename in processes) {

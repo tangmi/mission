@@ -1,5 +1,7 @@
 var fs = require('fs');
 
+//object that defines an app, based off a MissionFile in the
+//root directory of the app
 function Service(opt) {
 	opt = opt || {};
 	this.name = opt.name;

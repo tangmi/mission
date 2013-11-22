@@ -1,3 +1,10 @@
+/*
+ * apps.js
+ *
+ * returns a structs.Service by name for launcher to use
+ * 
+ */
+
 var fs = require('fs'),
 	path = require('path');
 

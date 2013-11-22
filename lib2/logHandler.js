@@ -1,10 +1,19 @@
+/*
+ * logHandler.js
+ *
+ * handles winston log output to a main logger and to app-specific
+ * loggers, by a struct.Service
+ * 
+ */
+
 'use strict';
 
 (function() {
 	var fs = require('fs'),
 		path = require('path');
 	var winston = require('winston');
-	var config = require('../config');
+	var config = require('../config'),
+		logsFolder = config.logfolder;
 
 	var defaultLogger = new(winston.Logger)({
 		transports: [
@@ -19,7 +28,6 @@
 		exitOnError: true
 	});
 
-	var logsFolder = config.logfolder;
 	if (!(fs.existsSync(logsFolder) && fs.statSync(logsFolder).isDirectory())) {
 		defaultLogger.info('App logs folder doesn\'t exists, creating it at: ' + logsFolder);
 		fs.mkdirSync(logsFolder);
@@ -29,17 +37,17 @@
 
 	module.exports = {
 		defaultLogger: defaultLogger,
-		getLogger: function(serviceName) {
-			if (!appLoggers[serviceName]) {
-				appLoggers[serviceName] = new(winston.Logger)({
+		getLogger: function(service) {
+			if (!appLoggers[service.name]) {
+				appLoggers[service.name] = new(winston.Logger)({
 					transports: [
 						new(winston.transports.File)({
-							filename: logsFolder + '/' + serviceName + '.log'
+							filename: logsFolder + '/' + service.name + '.log'
 						})
 					]
 				});
 			}
-			return appLoggers[serviceName];
+			return appLoggers[service.name];
 		}
 	};
 })();
