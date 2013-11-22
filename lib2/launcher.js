@@ -11,12 +11,13 @@ var apps = require('./apps');
 
 var config = require('../config');
 
-//key=servicename, value=process
+//key=servicename, value=(process + port field)
 var processes = {};
 
 
 
 //for testing
+startApp(apps('test'));
 startApp(apps('test'));
 // console.log(processes);
 
@@ -37,11 +38,18 @@ function startApp(service) {
 	var params = service.start.split(' ');
 	var cmd = params.splice(0, 1)[0];
 
-	process.env.PORT = 9000; //TODO find port
+	var oldport = process.env.PORT;
+
+	process.env.PORT = findNextPort();
 	processes[service.name] = spawn(cmd, params, {
 		cwd: appDir,
 		env: process.env
 	});
+
+	processes[service.name].port = process.env.PORT;
+
+	//reset to old port env value
+	process.env.PORT = oldport;
 
 	processes[service.name].stdout.on('data', function(data) {
 		printAppOutput('log', service.name, data.toString());
@@ -62,11 +70,12 @@ function startApp(service) {
 		delete processes[service.name];
 	});
 
-	logger.info(service.name + ': started. PID: ' + processes[service.name].pid);
+	logger.info(service.name + ': started (port: ' + processes[service.name].port + '). PID: ' + processes[service.name].pid);
 }
 
 function stopApp(service) {
 	//untested!
+	logger.info(service.name + ': stopping app...');
 	processes[service.name].kill('SIGTERM');
 	setTimeout(function() {
 		//check if app is closed, if not, kill it
@@ -77,19 +86,40 @@ function stopApp(service) {
 }
 
 function restartApp(service) {
+	//untested!
 	stopApp(service);
-	startApp(service);
+	setTimeout(function() {
+		startApp(service);
+	}, 2000);
 }
 
 function findProcessByServiceName(name) {
-	for (var i = 0; i < processes.length; i++) {
-		if (processes[i].service.name == name) {
-			return processes[i];
+	for (var servicename in processes) {
+		if (servicename == name) {
+			return processes[servicename];
 		}
 	}
 	return false;
 }
 
+function findNextPort() {
+	var start = 9001;
+	var end = 9999;
+
+	var assigned = start;
+	var ports = [];
+	for (var name in processes) {
+		ports.push(processes[name].port);
+	}
+	while (ports.indexOf(assigned) !== -1) {
+		assigned++;
+
+		if (assigned >= end) {
+			throw new Error('Can\'t find an empty port (' + start + '-' + end + '), giving up!');
+		}
+	}
+	return assigned;
+}
 
 //print app output indented with a name
 function printAppOutput(level, name, msg) {
