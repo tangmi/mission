@@ -17,7 +17,8 @@
     "hogan.js": "~2.0.0",
     "node-document": "0.1.0-pre9",
     "node-document-storage-fs": "~0.1.0",
-    "node-env-flag": "~0.1.0"
+    "node-env-flag": "~0.1.0",
+    "mkdirp": "~0.3.5"
   },
   "devDependencies": {
     "mocha": "~1.12.1"
