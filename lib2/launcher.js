@@ -12,10 +12,8 @@ var path = require('path'),
 var logHandler = require('./logHandler'),
 	logger = logHandler.defaultLogger;
 
-var Service = require('./structs').Service,
-	Process = require('./structs').Process;
-
-var apps = require('./apps');
+var apps = require('./apps'),
+	Service = apps.Service;
 
 var config = require('../config');
 
@@ -53,12 +51,15 @@ function startApp(service) {
 	var oldport = process.env.PORT;
 
 	process.env.PORT = findNextPort();
+	logger.debug('found port %d for %s', process.env.PORT, service.name);
 	processes[service.name] = spawn(cmd, params, {
 		cwd: appDir,
 		env: process.env
 	});
 
-	processes[service.name].port = process.env.PORT;
+	//move the port to an apps.js storage api
+	// processes[service.name].port = process.env.PORT;
+	apps(service.name).attr('port', process.env.PORT);
 
 	//reset to old port env value
 	process.env.PORT = oldport;
@@ -135,7 +136,7 @@ function findNextPort() {
 	var assigned = start;
 	var ports = [];
 	for (var name in processes) {
-		ports.push(processes[name].port);
+		ports.push(apps(name).attr('port'));
 	}
 	while (ports.indexOf(assigned) !== -1) {
 		assigned++;

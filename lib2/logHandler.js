@@ -18,6 +18,7 @@
 	var defaultLogger = new(winston.Logger)({
 		transports: [
 			new(winston.transports.Console)({
+				level: 'debug', //super verbose logging
 				handleExceptions: true
 			}), //just for debugging
 			new(winston.transports.File)({
