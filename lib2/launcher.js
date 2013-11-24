@@ -76,7 +76,7 @@ function startApp(service) {
 	});
 
 	processes[service.name].on('close', function(code, signal) {
-		logger.info('%s: process exited (code=%d, signal=%s)', service.name, code, signal);
+		logger.info('%s: process exited (code=%d, signal=%s)', service.name, code, '' + signal);
 		delete processes[service.name];
 	});
 
@@ -145,6 +145,10 @@ function findNextPort() {
 	}
 	return assigned;
 }
+
+/*
+ * purely debug stuff
+ */
 
 //print app output indented with a name
 function printAppOutput(level, name, msg) {

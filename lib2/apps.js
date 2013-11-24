@@ -2,6 +2,8 @@
  * apps.js
  *
  * returns a apps.Service by name for launcher to use
+ *
+ * includes apps.Service at bottom
  * 
  */
 
@@ -68,11 +70,17 @@ function missionFileMtime(name) {
 	return stats.mtime;
 }
 
-// var apps = list();
-// for(var i = 0; i < apps.length; i++) {
-// 	console.log(missionFile(apps[i]));
-// }
+module.exports = function(name) {
+	if (typeof name === 'undefined') {
+		return list();
+	} else {
+		return missionFile(name);
+	}
+};
 
+/*
+ * classes
+ */
 
 //object that defines an app, based off a MissionFile in the
 //root directory of the app
@@ -103,14 +111,5 @@ Service.prototype.attr = function(key, value) {
 		data[this.name].attr[key] = value;
 	}
 }
-
-
-module.exports = function(name) {
-	if (typeof name === 'undefined') {
-		return list();
-	} else {
-		return missionFile(name);
-	}
-};
 
 module.exports.Service = Service;
