@@ -99,7 +99,7 @@ Service.prototype.attr = function(key, value) {
 		return data[this.name].attr[key];
 	} else {
 		//set
-		logger.debug('app ' + this.name + ': setting ' + key + '=' + value);
+		logger.debug('apps.js %s: setting %s=%s', this.name, key, value);
 		data[this.name].attr[key] = value;
 	}
 }

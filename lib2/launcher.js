@@ -36,11 +36,11 @@ startApp(apps('test'));
 function startApp(service) {
 	var running = findProcessByServiceName(service.name);
 	if(running) {
-		logger.warn(service.name + ' already running!');
+		logger.warn('%s: app already running!', service.name);
 		return;
 	}
 
-	logger.info(service.name + ': starting app...');
+	logger.info('%s: starting app...', service.name);
 	logger.info(service.start);
 
 	var appDir = path.join(config.appfolder, service.name);
@@ -50,19 +50,16 @@ function startApp(service) {
 
 	var oldport = process.env.PORT;
 
-	process.env.PORT = findNextPort();
+	var port = findNextPort();
+	process.env.PORT = port;
 	logger.debug('found port %d for %s', process.env.PORT, service.name);
 	processes[service.name] = spawn(cmd, params, {
 		cwd: appDir,
 		env: process.env
 	});
-
-	//move the port to an apps.js storage api
-	// processes[service.name].port = process.env.PORT;
-	apps(service.name).attr('port', process.env.PORT);
-
-	//reset to old port env value
 	process.env.PORT = oldport;
+
+	apps(service.name).attr('port', port);
 
 	processes[service.name].stdout.on('data', function(data) {
 		printAppOutput('log', service.name, data.toString());
@@ -75,20 +72,20 @@ function startApp(service) {
 	});
 
 	processes[service.name].on('close', function(code) {
-		logger.info(service.name + ': process closed (code: ' + code + ')');
+		logger.info('%s: process closed (code=%d)', service.name, code);
 	});
 
 	processes[service.name].on('close', function(code, signal) {
-		logger.info(service.name + ': process exited (code: ' + code + ' signal: ' + signal + ')');
+		logger.info('%s: process exited (code=%d, signal=%s)', service.name, code, signal);
 		delete processes[service.name];
 	});
 
-	logger.info(service.name + ': started (port: ' + processes[service.name].port + '). PID: ' + processes[service.name].pid);
+	logger.info('%s: started (port=%d, pid=%d)', service.name, port, processes[service.name].pid);
 }
 
 function stopApp(service) {
 	//untested!
-	logger.info(service.name + ': stopping app...');
+	logger.info('%s: stopping app...', service.name);
 	processes[service.name].kill('SIGTERM');
 	setTimeout(function() {
 		//check if app is closed, if not, kill it
@@ -137,6 +134,7 @@ function findNextPort() {
 	var ports = [];
 	for (var name in processes) {
 		ports.push(apps(name).attr('port'));
+		logger.debug('used ports: [%s]', ports.join(','))
 	}
 	while (ports.indexOf(assigned) !== -1) {
 		assigned++;
@@ -156,5 +154,8 @@ function printAppOutput(level, name, msg) {
 		indent += ' ';
 	}
 	msg = msg.split('\n').join('\n' + indent);
+
+	//this output is in {config.logFolder}/{name}.log, so we don't
+	// need to use winston to log it
 	console.log(prefix + msg);
 }
