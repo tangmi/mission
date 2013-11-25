@@ -153,7 +153,7 @@ program
 		var out = [];
 		for(var i = 0; i < list.length; i++) {
 			var enabled = daemon.appStatus(list[i]);
-			out.push(list[i] + '\t' + enabled ? 'enabled' : '');
+			out.push(list[i] + '\t' + (enabled ? 'enabled' : ''));
 		}
 		console.log(out.join('\n'));
 	});
