@@ -8,17 +8,24 @@
 	var express = require('express');
 	var app = express();
 
-	var logger = require('../logHandler').defaultLogger;
+	var apps = require('../lib/apps'),
+		daemon = require('../lib/daemon');
+
+	var logger = require('../lib/logHandler').defaultLogger;
 
 	app.use(express.static(path.join(__dirname, 'public')));
 
 	app.get('/services', function(req, res) {
-		res.send(501);
+		res.json(apps());
 	});
 
 	app.get('/service/:serviceName', function(req, res) {
 		//service status
-		res.send(501);
+		var name = req.params.serviceName;
+		res.json({
+			service: apps(name),
+			enabled: daemon.appStatus(name)
+		});
 	});
 
 	app.get('/service/:serviceName/log', function(req, res) {
