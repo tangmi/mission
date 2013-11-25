@@ -1,13 +1,19 @@
 'use strict';
 
+
+var DEVELOPMENT = true;
+
+
 var path = require('path');
 
 var basedir = process.env[process.platform == 'win32' ? 'USERPROFILE' : 'HOME'];
 var nginxfolder = '/etc/nginx/sites-enabled';
 
-//just for testing
-basedir = './$HOME';
-nginxfolder = path.join(basedir, 'nginx', 'sites-enabled');
+if (DEVELOPMENT) {
+	//just for testing
+	basedir = './$HOME';
+	nginxfolder = path.join(basedir, 'nginx', 'sites-enabled');
+}
 
 module.exports = {
 	missionfolder: path.join(basedir, '.mission'),
