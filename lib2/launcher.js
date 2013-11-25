@@ -69,6 +69,8 @@ function startApp(service) {
 	processes[service.name].stderr.on('data', function(data) {
 		printAppOutput('err', service.name, data.toString());
 		logHandler.getLogger(service).error(data.toString());
+		//TODO: email me?
+		//https://github.com/guileen/node-sendmail
 	});
 
 	processes[service.name].on('close', function(code) {
@@ -77,6 +79,10 @@ function startApp(service) {
 
 	processes[service.name].on('close', function(code, signal) {
 		logger.info('%s: process exited (code=%d, signal=%s)', service.name, code, '' + signal);
+		if(+code > 0) {
+			logger.warn('app "%s" closed with an error! (code=%d)', service.name, code);
+			//TODO: email me?
+		}
 		delete processes[service.name];
 	});
 
@@ -103,6 +109,11 @@ function restartApp(service) {
 	}, 2000);
 }
 
+function stopAll() {
+	for(var name in processes) {
+		stopApp(apps(name));
+	}
+}
 
 /*
  * exports
@@ -111,6 +122,8 @@ function restartApp(service) {
 module.exports.start = startApp;
 module.exports.stop = stopApp;
 module.exports.restart = restartApp;
+
+module.exports.stopAll = stopAll;
 
 
 /*

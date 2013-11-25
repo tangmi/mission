@@ -32,6 +32,7 @@ function load(cb) {
 			if(allSites.indexOf(enabledSites[i]) !== -1) {
 				newEnabledSites.push(enabledSites[i]);
 			} else {
+				//clean up confs for nginx
 				nginx.remove(enabledSites[i]);
 				logger.debug('pruned site from enabled-sites: %s', enabledSites[i]);
 			}
@@ -67,4 +68,13 @@ function start(cb) {
 	});
 }
 
-start();
+function stop(cb) {
+	launcher.stopAll();
+	if(typeof cb === 'function') {
+		cb();
+	}
+}
+
+start(function() {
+	// stop();
+});
