@@ -3,15 +3,19 @@
 var path = require('path');
 
 var basedir = process.env[process.platform == 'win32' ? 'USERPROFILE' : 'HOME'];
+var nginxfolder = '/etc/nginx/sites-enabled';
 
 //just for testing
 basedir = './$HOME';
+nginxfolder = path.join(basedir, 'nginx', 'sites-enabled');
 
 module.exports = {
 	missionfolder: path.join(basedir, '.mission'),
 	appfolder: path.join(basedir, 'app'),
 	logfolder: path.join(basedir, 'log'),
 	pidfolder: path.join(basedir, 'pid'),
+
+	nginxfolder: nginxfolder,
 };
 
 

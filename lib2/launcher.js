@@ -24,8 +24,8 @@ var processes = {};
 
 
 //for testing
-startApp(apps('test'));
-startApp(apps('test'));
+// startApp(apps('test'));
+// startApp(apps('test'));
 
 
 /*
@@ -41,7 +41,7 @@ function startApp(service) {
 	}
 
 	logger.info('%s: starting app...', service.name);
-	logger.info(service.start);
+	logger.info('running command: `%s`', service.start);
 
 	var appDir = path.join(config.appfolder, service.name);
 
@@ -59,7 +59,7 @@ function startApp(service) {
 	});
 	process.env.PORT = oldport;
 
-	apps(service.name).attr('port', port);
+	service.attr('port', port);
 
 	processes[service.name].stdout.on('data', function(data) {
 		printAppOutput('log', service.name, data.toString());

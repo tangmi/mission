@@ -28,7 +28,13 @@ function list() {
 function missionFile(name) {
 	logger.debug('getting MissionFile for app: ' + name);
 	var service;
-	var mtime = missionFileMtime(name);
+	try {
+		var mtime = missionFileMtime(name);
+	} catch(e) {
+		//fail if we can't get the mtime (app not found)
+		logger.warn('could not find app "%s"', name);
+		return false;
+	}
 	if(data[name] && +data[name].mtime == +mtime) {
 		//missionfile exists in our cache and is up to date
 		logger.debug('found app ' + name + ' in apps.js cache');
@@ -58,7 +64,7 @@ function missionFile(name) {
 
 function missionFilePath(name) {
 	var filepath = path.join(config.appfolder, name, 'MissionFile');
-	if(fs.existsSync(filepath)) {	
+	if(fs.existsSync(filepath)) {
 		return filepath;
 	} else {
 		throw new Error('MissionFile doesn\'t exist for ' + name);
