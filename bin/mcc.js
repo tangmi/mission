@@ -97,7 +97,7 @@ program.command('status')
 	.action(function(options) {
 		var pid = daemon.status();
 		if (pid) {
-			console.log('mission running. (PID: ' + pid + ')');
+			console.log('mission running. (pid=' + pid + ')');
 		} else {
 			console.log('mission is not running.');
 		}
@@ -106,79 +106,56 @@ program.command('status')
 
 
 // service related commands
-var setup = require('../lib/setup');
-program
-	.command('add <service> <hostname>')
-	.description('adds a service to mcc')
-	.action(function(service, hostname, options) {
-		setup.add(service, hostname);
-	});
+var apps = require('../lib/apps'),
+	daemon = require('../lib/daemon');
+// program
+// 	.command('add <service> <hostname>')
+// 	.description('adds a service to mcc')
+// 	.action(function(service, hostname, options) {
+// 		setup.add(service, hostname);
+// 	});
 
-program
-	.command('remove <service>')
-	.description('removes a service from mcc')
-	.action(function(service, options) {
-		setup.remove(service);
-	});
+// program
+// 	.command('remove <service>')
+// 	.description('removes a service from mcc')
+// 	.action(function(service, options) {
+// 		setup.remove(service);
+// 	});
 
-program
-	.command('enable <service>')
-	.description('enables a service in nginx and makes it live')
-	.action(function(service, options) {
-		setup.enable(service);
-		// daemon.sendSignal("SIGUSR1");
-	});
+// program
+// 	.command('enable <service>')
+// 	.description('enables a service in nginx and makes it live')
+// 	.action(function(service, options) {
+// 		setup.enable(service);
+// 		// daemon.sendSignal("SIGUSR1");
+// 	});
 
-program
-	.command('disable <service>')
-	.description('removes a service from the enabled list and takes it down')
-	.action(function(service, options) {
-		setup.disable(service);
-		// daemon.sendSignal("SIGUSR1");
-	});
+// program
+// 	.command('disable <service>')
+// 	.description('removes a service from the enabled list and takes it down')
+// 	.action(function(service, options) {
+// 		setup.disable(service);
+// 		// daemon.sendSignal("SIGUSR1");
+// 	});
 
-program
-	.command('reload')
-	.description('tells mcc to update its state to match the config')
-	.action(function(service, options) {
-		daemon.sendSignal("SIGUSR1");
-	});
+// program
+// 	.command('reload')
+// 	.description('tells mcc to update its state to match the config')
+// 	.action(function(service, options) {
+// 		daemon.sendSignal("SIGUSR1");
+// 	});
 
 program
 	.command('list')
 	.description('lists all available sites')
 	.action(function(options) {
-		console.log(setup.list());
-	});
-
-
-
-// configuration commands
-var configure = require('../lib/configure');
-program
-	.command('config [key] [value]')
-	.description('sets/gets configuration values')
-	.option('-l, --list', 'lists all set configurations')
-	.action(function(key, value, options) {
-		if (options.list) {
-			console.log(configure.list());
-		} else {
-			if (key && value) {
-				configure.set(key, value, function() {});
-			} else if (key) {
-				configure.get(key, function(value) {
-					console.log(value);
-				});
-			} else {
-				console.log('');
-				console.log('  Usage: mcc config[options][key][value]');
-				console.log('');
-				console.log('  Options: ')
-				console.log('');
-				console.log('    -l, --list lists configuration key value pairs');
-				console.log('');
-			}
+		var list = apps();
+		var out = [];
+		for(var i = 0; i < list.length; i++) {
+			var enabled = daemon.appStatus(list[i]);
+			out.push(list[i] + '\t' + enabled ? 'enabled' : '');
 		}
+		console.log(out.join('\n'));
 	});
 
 
