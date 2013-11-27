@@ -106,8 +106,8 @@ program.command('status')
 
 
 // service related commands
-var apps = require('../lib/apps'),
-	daemon = require('../lib/daemon');
+var apps = require('../lib/apps');
+
 // program
 // 	.command('add <service> <hostname>')
 // 	.description('adds a service to mcc')
@@ -152,7 +152,8 @@ program
 		var list = apps();
 		var out = [];
 		for(var i = 0; i < list.length; i++) {
-			var enabled = daemon.appStatus(list[i]);
+			var service = apps(list[i]);
+			var enabled = service.data('enabled');
 			out.push(list[i] + '\t' + (enabled ? 'enabled' : ''));
 		}
 		console.log(out.join('\n'));
