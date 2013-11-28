@@ -13,41 +13,39 @@ var daemon = require('daemonize2')
 	.setup({
 		main: path.join(__dirname, '../lib/daemon.js'),
 		name: 'mission',
+		cwd: path.join(__dirname, '..'),
 		// pidfile: path.join(config.missionfolder, 'mission.pid'), //default /var/run/mission.pid
 		// user: 'git',
 		// group: 'git',
-		silent: false
+		silent: true
 	});
 
 if (process.getuid() != 0) {
-	console.log('expected to run as root, exiting.');
+	logger.warn('expected to run as root, exiting.');
 	process.exit(1);
 }
 
 daemon
 	.on('starting', function() {
-		// console.log('Starting daemon...');
+		logger.info('starting daemon...');
 	})
 	.on('started', function(pid) {
-		// console.log('Daemon started. PID: ' + pid);
-		logger.info('daemon started. PID: ' + pid);
+		logger.info('daemon started. (pid=%d)', pid);
 	})
 	.on('stopping', function() {
-		// console.log('Stopping daemon...');
+		logger.info('stopping daemon...');
 	})
 	.on('stopped', function(pid) {
-		// console.log('Daemon stopped.');
 		logger.info('daemon stopped.');
 	})
 	.on('running', function(pid) {
-		// console.log('Daemon already running. PID: ' + pid);
+		logger.info('daemon already running. (pid=%d)', pid);
 	})
 	.on('notrunning', function() {
-		// console.log('Daemon is not running');
+		logger.info('daemon is not running');
 	})
 	.on('error', function(err) {
-		// console.log('Daemon failed to start: ' + err.message);
-		logger.info('daemon failed to start: ' + err.message);
+		logger.info('daemon failed to start: %s', err.message);
 	});
 
 program.version(def.version);
@@ -55,10 +53,10 @@ program.version(def.version);
 // program.usage('[path] [options]')
 // program.option('-p, --port <port>', 'set a custom port (default 9000)')
 // program.on('--help', function() {
-// 	console.log('  Path:');
-// 	console.log('');
-// 	console.log('    directory to start the static server in. will use current directory if not supplied.');
-// 	console.log('');
+// 	logger.info('  Path:');
+// 	logger.info('');
+// 	logger.info('    directory to start the static server in. will use current directory if not supplied.');
+// 	logger.info('');
 // });
 
 // process related commands
@@ -108,42 +106,41 @@ program.command('status')
 // service related commands
 var apps = require('../lib/apps');
 
-// program
-// 	.command('add <service> <hostname>')
-// 	.description('adds a service to mcc')
-// 	.action(function(service, hostname, options) {
-// 		setup.add(service, hostname);
-// 	});
+program
+	.command('enable <service>')
+	.description('enables a service in nginx and makes it live')
+	.action(function(service, options) {
+		var app = apps(service);
+		if(app) {
+			app.data('enabled', true);
+			daemon.sendSignal("SIGUSR1");
+			logger.info('enabled app %s', service);
+		} else {
+			logger.info('could not enable app "%s"', service);
+		}
+	});
 
-// program
-// 	.command('remove <service>')
-// 	.description('removes a service from mcc')
-// 	.action(function(service, options) {
-// 		setup.remove(service);
-// 	});
+program
+	.command('disable <service>')
+	.description('removes a service from the enabled list and takes it down')
+	.action(function(service, options) {
+		var app = apps(service);
+		if(app) {
+			app.data('enabled', false);
+			daemon.sendSignal("SIGUSR1");
+			logger.info('disabled app %s', service);
+		} else {
+			logger.info('could not disable app "%s"', service);
+		}
+	});
 
-// program
-// 	.command('enable <service>')
-// 	.description('enables a service in nginx and makes it live')
-// 	.action(function(service, options) {
-// 		setup.enable(service);
-// 		// daemon.sendSignal("SIGUSR1");
-// 	});
-
-// program
-// 	.command('disable <service>')
-// 	.description('removes a service from the enabled list and takes it down')
-// 	.action(function(service, options) {
-// 		setup.disable(service);
-// 		// daemon.sendSignal("SIGUSR1");
-// 	});
-
-// program
-// 	.command('reload')
-// 	.description('tells mcc to update its state to match the config')
-// 	.action(function(service, options) {
-// 		daemon.sendSignal("SIGUSR1");
-// 	});
+program
+	.command('reload')
+	.description('tells mcc to update its state to match the config')
+	.action(function(service, options) {
+		daemon.sendSignal("SIGUSR1");
+		logger.info('sent signal to daemon to reload apps')
+	});
 
 program
 	.command('list')
@@ -156,7 +153,7 @@ program
 			var enabled = service.data('enabled');
 			out.push(list[i] + '\t' + (enabled ? 'enabled' : ''));
 		}
-		console.log(out.join('\n'));
+		console.log('%d app' + (list.length === 1 ? '' : 's') + '\n%s', list.length, out.join('\n'));
 	});
 
 

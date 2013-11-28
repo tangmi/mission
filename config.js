@@ -11,8 +11,8 @@ var nginxfolder = '/etc/nginx/sites-enabled';
 
 if (DEVELOPMENT) {
 	//just for testing
-	basedir = './$HOME';
-	nginxfolder = path.join(basedir, 'nginx', 'sites-enabled');
+	basedir = path.resolve('./_HOME');
+	nginxfolder = path.resolve(path.join(basedir, 'nginx', 'sites-enabled'));
 }
 
 module.exports = {
@@ -23,7 +23,6 @@ module.exports = {
 
 	nginxfolder: nginxfolder,
 };
-
 
 for (var key in module.exports) {
 	if (module.exports.hasOwnProperty(key)) {

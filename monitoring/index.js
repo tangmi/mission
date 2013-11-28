@@ -22,9 +22,11 @@
 	app.get('/service/:serviceName', function(req, res) {
 		//service status
 		var name = req.params.serviceName;
+		var service = apps(name);
 		res.json({
-			service: apps(name),
-			enabled: daemon.appStatus(name)
+			service: service,
+			attr: service.attr(),
+			data: service.data()
 		});
 	});
 
