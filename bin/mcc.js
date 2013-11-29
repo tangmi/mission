@@ -137,9 +137,9 @@ program
 program
 	.command('reload')
 	.description('tells mcc to update its state to match the config')
-	.action(function(service, options) {
+	.action(function(options) {
 		daemon.sendSignal("SIGUSR1");
-		logger.info('sent signal to daemon to reload apps')
+		logger.info('sent signal to daemon to reload apps');
 	});
 
 program

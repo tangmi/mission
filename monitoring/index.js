@@ -23,11 +23,15 @@
 		//service status
 		var name = req.params.serviceName;
 		var service = apps(name);
-		res.json({
-			service: service,
-			attr: service.attr(),
-			data: service.data()
-		});
+		if(service) {
+			res.json({
+				service: service,
+				attr: service.attr(),
+				data: service.data()
+			});
+		} else {
+			res.send(404);
+		}
 	});
 
 	app.get('/service/:serviceName/log', function(req, res) {

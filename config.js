@@ -19,7 +19,7 @@ module.exports = {
 	missionfolder: path.join(basedir, '.mission'),
 	appfolder: path.join(basedir, 'app'),
 	logfolder: path.join(basedir, 'log'),
-	pidfolder: path.join(basedir, 'pid'),
+	pidfolder: path.join(basedir, '.mission', 'pid'),
 
 	nginxfolder: nginxfolder,
 };
